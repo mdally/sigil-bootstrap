@@ -25,15 +25,11 @@ function Assert-Success($what) { if ($LASTEXITCODE -ne 0) { throw "$what failed;
 
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Write-Step 'installing Git'
-    # The release environment_setup.ps1 pins, which it then finds new enough. Twice at most:
-    # winget on a newly installed Windows sometimes fails once, then succeeds. Only the winget
+    # The release environment_setup.ps1 pins, which it then finds new enough. Only the winget
     # source: there the Microsoft Store source can fail its certificate check, and an install that
     # searches every source fails with it.
-    foreach ($attempt in 1, 2) {
-        winget install --id Git.Git --exact --version 2.55.0.5 --source winget --silent `
-            --accept-package-agreements --accept-source-agreements --disable-interactivity
-        if ($LASTEXITCODE -eq 0) { break }
-    }
+    winget install --id Git.Git --exact --version 2.55.0.5 --source winget --silent `
+        --accept-package-agreements --accept-source-agreements --disable-interactivity
     Assert-Success 'Installing Git'
     # The installer changed PATH for new terminals; this one reads it again.
     $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' +
